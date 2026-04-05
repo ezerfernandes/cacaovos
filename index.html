@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
 <meta charset="utf-8">
@@ -11,101 +12,103 @@
 body { overflow:hidden; font-family:Arial,sans-serif; }
 
 #hud {
-  position:fixed; top:0; left:0; right:0; z-index:999;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:12px 16px;
-  background:linear-gradient(to bottom,rgba(0,0,0,0.5),transparent);
-  pointer-events:none;
+position:fixed; top:0; left:0; right:0; z-index:999;
+display:flex; justify-content:space-between; align-items:center;
+padding:12px 16px;
+background:linear-gradient(to bottom,rgba(0,0,0,0.5),transparent);
+pointer-events:none;
 }
 .pill {
-  background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.4);
-  border-radius:999px; padding:7px 18px; color:#fff;
-  font-size:18px; font-weight:bold; backdrop-filter:blur(6px);
-  text-shadow:0 1px 3px rgba(0,0,0,0.5);
+background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.4);
+border-radius:999px; padding:7px 18px; color:#fff;
+font-size:18px; font-weight:bold; backdrop-filter:blur(6px);
+text-shadow:0 1px 3px rgba(0,0,0,0.5);
 }
 #timerEl.urgent { border-color:#ff4444; color:#ff8888; animation:blink .5s infinite alternate; }
 @keyframes blink { to { opacity:.4; } }
 
 #toast {
-  position:fixed; top:42%; left:50%; transform:translate(-50%,-50%);
-  background:rgba(255,255,255,0.93); border-radius:20px;
-  padding:12px 28px; font-size:24px; font-weight:bold; color:#333;
-  z-index:1000; pointer-events:none; opacity:0; transition:opacity .25s;
+position:fixed; top:42%; left:50%; transform:translate(-50%,-50%);
+background:rgba(255,255,255,0.93); border-radius:20px;
+padding:12px 28px; font-size:24px; font-weight:bold; color:#333;
+z-index:1000; pointer-events:none; opacity:0; transition:opacity .25s;
 }
 
 /* Splash */
 #splash {
-  position:fixed; inset:0; z-index:2000;
-  background:linear-gradient(135deg,#a8edea,#fed6e3);
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:14px; text-align:center; padding:28px;
+position:fixed; inset:0; z-index:2000;
+background:linear-gradient(135deg,#a8edea,#fed6e3);
+display:flex; flex-direction:column; align-items:center;
+justify-content:center; gap:14px; text-align:center; padding:28px;
 }
 #splash h1 { font-size:32px; color:#444; }
 #splash p  { font-size:15px; color:#666; max-width:300px; line-height:1.6; }
 .big { font-size:52px; }
 #startBtn {
-  margin-top:8px;
-  background:linear-gradient(135deg,#f093fb,#f5576c);
-  color:#fff; border:none; border-radius:30px;
-  padding:16px 44px; font-size:20px; font-weight:bold; cursor:pointer;
-  box-shadow:0 4px 15px rgba(245,87,108,.4);
+margin-top:8px;
+background:linear-gradient(135deg,#f093fb,#f5576c);
+color:#fff; border:none; border-radius:30px;
+padding:16px 44px; font-size:20px; font-weight:bold; cursor:pointer;
+box-shadow:0 4px 15px rgba(245,87,108,.4);
 }
 #markerBtn {
-  background:rgba(255,255,255,0.4); border:2px solid rgba(0,0,0,0.15);
-  border-radius:30px; padding:12px 32px; font-size:16px;
-  font-weight:bold; cursor:pointer; color:#555;
+background:rgba(255,255,255,0.4); border:2px solid rgba(0,0,0,0.15);
+border-radius:30px; padding:12px 32px; font-size:16px;
+font-weight:bold; cursor:pointer; color:#555;
 }
 
 /* Marker sheet */
 #markerSheet {
-  position:fixed; inset:0; z-index:3000;
-  background:#fff; overflow-y:auto;
-  display:none; flex-direction:column; align-items:center;
-  padding:20px; gap:20px;
+position:fixed; inset:0; z-index:3000;
+background:#fff; overflow-y:auto;
+display:none; flex-direction:column; align-items:center;
+padding:20px; gap:20px;
 }
 #markerSheet h2 { font-size:22px; color:#333; margin-top:10px; }
 #markerSheet p  { font-size:13px; color:#666; text-align:center; max-width:320px; }
 .marker-grid {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:16px; width:100%; max-width:360px;
+display:grid; grid-template-columns:1fr 1fr;
+gap:16px; width:100%; max-width:360px;
 }
 .marker-card {
-  border:3px solid #333; border-radius:12px;
-  overflow:hidden; display:flex; flex-direction:column;
-  align-items:center; background:#fafafa;
+border:3px solid #333; border-radius:12px;
+overflow:hidden; display:flex; flex-direction:column;
+align-items:center; background:#fafafa;
 }
 .marker-card canvas { width:100%; aspect-ratio:1; }
 .marker-label {
-  font-size:13px; font-weight:bold; color:#444;
-  padding:6px; text-align:center;
+font-size:13px; font-weight:bold; color:#444;
+padding:6px; text-align:center;
 }
 #closeSheet {
-  background:linear-gradient(135deg,#f093fb,#f5576c);
-  color:#fff; border:none; border-radius:30px;
-  padding:14px 40px; font-size:18px; font-weight:bold; cursor:pointer;
-  margin-bottom:20px;
+background:linear-gradient(135deg,#f093fb,#f5576c);
+color:#fff; border:none; border-radius:30px;
+padding:14px 40px; font-size:18px; font-weight:bold; cursor:pointer;
+margin-bottom:20px;
 }
 
 /* End screen */
 #endScreen {
-  position:fixed; inset:0; z-index:2000;
-  background:linear-gradient(135deg,#a8edea,#fed6e3);
-  display:none; flex-direction:column; align-items:center;
-  justify-content:center; gap:14px; text-align:center; padding:28px;
+position:fixed; inset:0; z-index:2000;
+background:linear-gradient(135deg,#a8edea,#fed6e3);
+display:none; flex-direction:column; align-items:center;
+justify-content:center; gap:14px; text-align:center; padding:28px;
 }
 #endScreen h1 { font-size:32px; color:#444; }
 #finalScore   { font-size:64px; font-weight:bold; color:#f5576c; }
 #endMsg       { font-size:16px; color:#666; }
 #restartBtn {
-  background:linear-gradient(135deg,#43e97b,#38f9d7);
-  color:#fff; border:none; border-radius:30px;
-  padding:16px 44px; font-size:20px; font-weight:bold; cursor:pointer;
+background:linear-gradient(135deg,#43e97b,#38f9d7);
+color:#fff; border:none; border-radius:30px;
+padding:16px 44px; font-size:20px; font-weight:bold; cursor:pointer;
 }
 </style>
+
 </head>
 <body>
 
 <!-- Splash -->
+
 <div id="splash">
   <div class="big">🥚🐰🌸</div>
   <h1>AR Easter Egg Hunt</h1>
@@ -115,6 +118,7 @@ body { overflow:hidden; font-family:Arial,sans-serif; }
 </div>
 
 <!-- Marker Sheet -->
+
 <div id="markerSheet">
   <h2>🖨️ Your Egg Markers</h2>
   <p>Print these out or draw them on paper (at least 3 inches wide). Hide them around your house!</p>
@@ -123,6 +127,7 @@ body { overflow:hidden; font-family:Arial,sans-serif; }
 </div>
 
 <!-- End Screen -->
+
 <div id="endScreen">
   <div class="big">🏆</div>
   <h1>Time's Up!</h1>
@@ -132,6 +137,7 @@ body { overflow:hidden; font-family:Arial,sans-serif; }
 </div>
 
 <!-- HUD -->
+
 <div id="hud">
   <div class="pill">🥚 <span id="scoreEl">0</span>/<span id="totalEl">2</span></div>
   <div class="pill" id="timerEl">⏱ <span id="timeEl">60</span>s</div>
@@ -140,17 +146,20 @@ body { overflow:hidden; font-family:Arial,sans-serif; }
 <div id="toast"></div>
 
 <!-- AR Scene -->
+
 <a-scene
-  id="arScene"
-  embedded
-  arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-  vr-mode-ui="enabled: false"
-  renderer="logarithmicDepthBuffer: true; antialias: true;"
-  style="display:none">
+id="arScene"
+embedded
+arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+vr-mode-ui="enabled: false"
+renderer="logarithmicDepthBuffer: true; antialias: true;"
+style="display:none">
 
   <!-- EGG 1: Hiro marker -->
+
   <a-marker id="marker-hiro" preset="hiro">
-    <a-entity id="egg-hiro" position="0 0.5 0" visible="true">
+    <a-entity id="egg-hiro" position="0 0.5 0" visible="true"
+      animation="property: position; to: 0 0.75 0; dir: alternate; dur: 1000; loop: true; easing: easeInOutSine">
       <a-sphere
         color="#FF6B6B"
         radius="0.4"
@@ -166,11 +175,11 @@ body { overflow:hidden; font-family:Arial,sans-serif; }
       </a-torus>
       <a-sphere color="white" radius="0.07" position="0.22 0.15 0.28"></a-sphere>
       <a-sphere color="white" radius="0.05" position="-0.18 0.3 0.28"></a-sphere>
-      <a-animation attribute="position" to="0 0.75 0" direction="alternate" dur="1000" repeat="indefinite" easing="easeInOutSine"></a-animation>
     </a-entity>
   </a-marker>
 
   <!-- EGG 2: Kanji marker -->
+
   <a-marker id="marker-kanji" preset="kanji">
     <a-entity id="egg-kanji" position="0 0.5 0" visible="true">
       <a-sphere
@@ -192,7 +201,7 @@ body { overflow:hidden; font-family:Arial,sans-serif; }
     </a-entity>
   </a-marker>
 
-  <a-entity camera></a-entity>
+<a-entity camera></a-entity>
 </a-scene>
 
 <script>
@@ -359,5 +368,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => el.style.opacity = 0, 1000);
 }
 </script>
+
 </body>
 </html>
