@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>🥚 AR Easter Egg Hunt</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; font-family: 'Arial Rounded MT Bold', Arial, sans-serif; }
+
+    #ui {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+      z-index: 999; pointer-events: none;
+    }
+    #score-box {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 8px 18px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    #timer-box {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 8px 18px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    #timer-box.urgent { border-color: #ff4444; color: #ff8888; animation: pulse 0.5s infinite alternate; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+
+    #toast {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px; padding: 14px 28px;
+      font-size: 22px; font-weight: bold; color: #333;
+      z-index: 1000; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s;
+    }
+
+    #splash {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 2000; gap: 16px;
+      text-align: center; padding: 24px;
+    }
+    #splash h1 { font-size: 36px; color: #444; }
+    #splash p { font-size: 16px; color: #666; max-width: 300px; }
+    #splash .eggs { font-size: 48px; letter-spacing: 8px; margin: 10px 0; }
+    #start-btn {
+      margin-top: 10px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white; border: none; border-radius: 30px;
+      padding: 16px 40px; font-size: 20px; font-weight: bold;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(245,87,108,0.4);
+      pointer-events: all;
+    }
+    #start-btn:active { transform: scale(0.96); }
+
+    #end-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 2000; gap: 16px; text-align: center; padding: 24px;
+    }
+    #end-screen h1 { font-size: 36px; color: #444; }
+    #end-screen .result { font-size: 64px; font-weight: bold; color: #f5576c; }
+    #end-screen p { font-size: 16px; color: #666; }
+    #restart-btn {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: white; border: none; border-radius: 30px;
+      padding: 16px 40px; font-size: 20px; font-weight: bold;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(67,233,123,0.4);
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <div class="eggs">🥚🐣🐰</div>
+  <h1>Easter Egg Hunt!</h1>
+  <p>Point your camera around the room to find hidden eggs. Tap them to collect!</p>
+  <p style="font-size:13px;color:#999;margin-top:4px;">Allow camera access when prompted.</p>
+  <button id="start-btn" onclick="startGame()">Start Hunt 🐰</button>
+</div>
+
+<!-- End Screen -->
+<div id="end-screen">
+  <div style="font-size:56px">🏆</div>
+  <h1>Time's Up!</h1>
+  <div class="result" id="final-score">0 / 10</div>
+  <p id="end-msg">Keep hunting next time!</p>
+  <button id="restart-btn" onclick="restartGame()">Play Again 🥚</button>
+</div>
+
+<!-- HUD -->
+<div id="ui">
+  <div id="score-box">🥚 <span id="score">0</span> / <span id="total">10</span></div>
+  <div id="timer-box">⏱ <span id="timer">60</span>s</div>
+</div>
+
+<div id="toast"></div>
+
+<a-scene
+  id="scene"
+  embedded
+  arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;"
+  vr-mode-ui="enabled: false"
+  renderer="antialias: true; alpha: true"
+  style="display:none">
+
+  <a-assets>
+    <!-- Egg colors baked into geometry via JS -->
+  </a-assets>
+
+  <a-camera>
+    <a-cursor
+      fuse="true"
+      fuse-timeout="1000"
+      color="white"
+      opacity="0.8"
+      raycaster="objects: .egg"
+      animation__click="property: scale; startEvents: click; from: 1.5 1.5 1.5; to: 1 1 1; dur: 200">
+    </a-cursor>
+  </a-camera>
+
+</a-scene>
+
+<script>
+const TOTAL_EGGS = 10;
+const GAME_TIME = 60;
+const EGG_COLORS = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF6FC8','#FF9A3C','#C77DFF','#00CFD5','#FF4D6D','#B5E48C'];
+const MESSAGES = ['🎉 Nice find!','✨ Got one!','🐰 Boink!','🌟 Yes!','💛 Sweet!'];
+
+let score = 0, timeLeft = GAME_TIME, timerInterval, gameActive = false;
+
+function startGame() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('scene').style.display = 'block';
+  score = 0;
+  timeLeft = GAME_TIME;
+  gameActive = true;
+  updateHUD();
+  spawnEggs();
+  timerInterval = setInterval(tick, 1000);
+}
+
+function restartGame() {
+  document.getElementById('end-screen').style.display = 'none';
+  // Remove old eggs
+  document.querySelectorAll('.egg').forEach(e => e.parentNode && e.parentNode.removeChild(e));
+  startGame();
+}
+
+function tick() {
+  timeLeft--;
+  document.getElementById('timer').textContent = timeLeft;
+  if (timeLeft <= 10) document.getElementById('timer-box').classList.add('urgent');
+  if (timeLeft <= 0) endGame();
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  gameActive = false;
+  const s = score, t = TOTAL_EGGS;
+  document.getElementById('final-score').textContent = `${s} / ${t}`;
+  const msgs = s === t ? '🎊 Perfect! You found them all!' : s >= t*0.7 ? '🌟 Great job, egg hunter!' : s >= t*0.4 ? '🐣 Not bad, keep practicing!' : '🔍 They were well hidden!';
+  document.getElementById('end-msg').textContent = msgs;
+  document.getElementById('end-screen').style.display = 'flex';
+}
+
+function updateHUD() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('total').textContent = TOTAL_EGGS;
+  document.getElementById('timer').textContent = timeLeft;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = 1;
+  setTimeout(() => t.style.opacity = 0, 900);
+}
+
+function randRange(min, max) { return Math.random() * (max - min) + min; }
+
+function spawnEggs() {
+  const scene = document.getElementById('scene');
+
+  for (let i = 0; i < TOTAL_EGGS; i++) {
+    // Spread eggs in a sphere around the user
+    const theta = randRange(0, Math.PI * 2);   // horizontal angle
+    const phi = randRange(0.2, 0.8) * Math.PI; // vertical angle (avoid top/bottom)
+    const r = randRange(2.5, 5);               // distance
+
+    const x = r * Math.sin(phi) * Math.cos(theta);
+    const y = randRange(-0.5, 1.5);
+    const z = r * Math.sin(phi) * Math.sin(theta);
+
+    const color = EGG_COLORS[i % EGG_COLORS.length];
+
+    // Egg = scaled sphere
+    const egg = document.createElement('a-sphere');
+    egg.setAttribute('position', `${x} ${y} ${z}`);
+    egg.setAttribute('radius', '0.12');
+    egg.setAttribute('scale', '1 1.4 1');
+    egg.setAttribute('color', color);
+    egg.setAttribute('class', 'egg');
+    egg.setAttribute('shadow', '');
+    egg.setAttribute('data-index', i);
+
+    // Stripes
+    const stripe = document.createElement('a-torus');
+    stripe.setAttribute('position', `${x} ${y + 0.04} ${z}`);
+    stripe.setAttribute('radius', '0.095');
+    stripe.setAttribute('radius-tubular', '0.018');
+    stripe.setAttribute('color', 'white');
+    stripe.setAttribute('opacity', '0.6');
+    stripe.setAttribute('rotation', '90 0 0');
+    stripe.setAttribute('scale', '1 0.3 1');
+
+    // Hover bob animation
+    egg.setAttribute('animation', `property: position; to: ${x} ${y+0.12} ${z}; dir: alternate; dur: ${1200 + i*150}; loop: true; easing: easeInOutSine`);
+
+    // Click handler
+    egg.addEventListener('click', () => collectEgg(egg, stripe, i));
+
+    scene.appendChild(egg);
+    scene.appendChild(stripe);
+  }
+}
+
+function collectEgg(egg, stripe, idx) {
+  if (!gameActive) return;
+  if (egg.getAttribute('data-collected')) return;
+  egg.setAttribute('data-collected', 'true');
+
+  score++;
+  updateHUD();
+  showToast(MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
+
+  // Pop animation then remove
+  egg.setAttribute('animation', 'property: scale; to: 2 2 2; dur: 200; easing: easeOutQuad');
+  egg.setAttribute('animation__fade', 'property: opacity; to: 0; dur: 300; delay: 150');
+  if (stripe) {
+    stripe.setAttribute('animation__fade', 'property: opacity; to: 0; dur: 300; delay: 150');
+  }
+  setTimeout(() => {
+    egg.parentNode && egg.parentNode.removeChild(egg);
+    stripe && stripe.parentNode && stripe.parentNode.removeChild(stripe);
+  }, 500);
+
+  if (score >= TOTAL_EGGS) endGame();
+}
+</script>
+</body>
+</html>
