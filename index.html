@@ -233,21 +233,21 @@ function drawHiro(ctx, size) {
 }
 
 function drawKanji(ctx, size) {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => ctx.drawImage(img, 0, 0, size, size);
-  img.onerror = () => {
-    // Fallback text if image fails
-    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,size,size);
-    ctx.fillStyle = '#000';
-    const b = size * 0.12;
-    ctx.fillRect(0,0,size,b); ctx.fillRect(0,size-b,size,b);
-    ctx.fillRect(0,0,b,size); ctx.fillRect(size-b,0,b,size);
-    ctx.font = `bold ${size*0.2}px Arial`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('KANJI', size/2, size/2);
-  };
-  img.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kanji_marker_ARjs.png/240px-Kanji_marker_ARjs.png';
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,size,size);
+  ctx.fillStyle = '#000';
+  const b = size * 0.12;
+  ctx.fillRect(0,0,size,b); ctx.fillRect(0,size-b,size,b);
+  ctx.fillRect(0,0,b,size); ctx.fillRect(size-b,0,b,size);
+  ctx.font = `bold ${size*0.18}px Arial`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('KANJI', size/2, size*0.38);
+  ctx.font = `${size*0.1}px Arial`;
+  ctx.fillText('ar-js-org.github.io', size/2, size*0.58);
+  ctx.fillText('/AR.js/three.js/examples/', size/2, size*0.68);
+  ctx.fillText('marker-training/', size/2, size*0.77);
+  ctx.font = `bold ${size*0.1}px Arial`;
+  ctx.fillStyle = '#e00';
+  ctx.fillText('Print: bit.ly/kanji-ar', size/2, size*0.88);
 }
 
 function buildMarkerSheet() {
